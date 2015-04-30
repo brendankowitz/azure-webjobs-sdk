@@ -6,7 +6,7 @@ using Microsoft.Azure.WebJobs.Host.Executors;
 
 namespace Microsoft.Azure.WebJobs.Host.Triggers
 {
-    internal interface ITriggeredFunctionInstanceFactory<TTriggerValue> : IFunctionInstanceFactory
+    public interface ITriggeredFunctionInstanceFactory<TTriggerValue> : IFunctionInstanceFactory
     {
         IFunctionInstance Create(TTriggerValue value, Guid? parentId);
     }

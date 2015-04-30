@@ -14,7 +14,7 @@ namespace Microsoft.Azure.WebJobs.Host.Bindings.Path
     /// template parameters with parameter values.
     /// </summary>
     [DebuggerDisplay("{Pattern,nq}")]
-    internal class BindingTemplate
+    public class BindingTemplate
     {
         private readonly string _pattern;
         private readonly IReadOnlyList<BindingTemplateToken> _tokens;

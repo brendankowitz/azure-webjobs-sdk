@@ -6,7 +6,7 @@ using Microsoft.Azure.WebJobs.Host.Listeners;
 
 namespace Microsoft.Azure.WebJobs.Host.Indexers
 {
-    internal class FunctionDefinition : IFunctionDefinition
+    public class FunctionDefinition : IFunctionDefinition
     {
         private readonly IFunctionInstanceFactory _instanceFactory;
         private readonly IListenerFactory _listenerFactory;

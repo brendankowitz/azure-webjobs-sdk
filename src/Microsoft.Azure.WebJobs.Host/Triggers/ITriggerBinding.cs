@@ -11,7 +11,7 @@ using Microsoft.Azure.WebJobs.Host.Protocols;
 
 namespace Microsoft.Azure.WebJobs.Host.Triggers
 {
-    internal interface ITriggerBinding
+    public interface ITriggerBinding
     {
         IReadOnlyDictionary<string, Type> BindingDataContract { get; }
 

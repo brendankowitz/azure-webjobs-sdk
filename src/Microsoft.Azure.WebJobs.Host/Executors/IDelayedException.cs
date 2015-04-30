@@ -3,7 +3,7 @@
 
 namespace Microsoft.Azure.WebJobs.Host.Executors
 {
-    internal interface IDelayedException
+    public interface IDelayedException
     {
         void Throw();
     }

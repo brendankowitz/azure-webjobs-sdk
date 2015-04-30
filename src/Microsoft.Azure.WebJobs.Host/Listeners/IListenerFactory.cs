@@ -7,7 +7,7 @@ using Microsoft.Azure.WebJobs.Host.Executors;
 
 namespace Microsoft.Azure.WebJobs.Host.Listeners
 {
-    internal interface IListenerFactory
+    public interface IListenerFactory
     {
         Task<IListener> CreateAsync(IFunctionExecutor executor, CancellationToken cancellationToken);
     }

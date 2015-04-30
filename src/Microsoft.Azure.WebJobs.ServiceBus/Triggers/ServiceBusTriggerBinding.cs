@@ -11,6 +11,7 @@ using Microsoft.Azure.WebJobs.Host.Indexers;
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
+using Microsoft.Azure.WebJobs.ServiceBus.Bindings;
 using Microsoft.Azure.WebJobs.ServiceBus.Listeners;
 using Microsoft.ServiceBus.Messaging;
 
@@ -120,13 +121,18 @@ namespace Microsoft.Azure.WebJobs.ServiceBus.Triggers
 
         public ParameterDescriptor ToParameterDescriptor()
         {
+            string entityPath = _queueName != null ?
+                    _queueName : string.Format("{0}/Subscriptions/{1}", _topicName, _subscriptionName);
+
+            // TODO: Need to find a way to serialize these extended properties
             return new ServiceBusTriggerParameterDescriptor
             {
                 Name = _parameterName,
                 NamespaceName = _namespaceName,
                 QueueName = _queueName,
                 TopicName = _topicName,
-                SubscriptionName = _subscriptionName
+                SubscriptionName = _subscriptionName,
+                UIDescriptor = ServiceBusBinding.CreateParameterUIDescriptor(entityPath, true)
             };
         }
 

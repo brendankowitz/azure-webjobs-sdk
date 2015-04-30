@@ -8,7 +8,7 @@ using Microsoft.Azure.WebJobs.Host.Protocols;
 
 namespace Microsoft.Azure.WebJobs.Host.Triggers
 {
-    internal class TriggeredFunctionInstanceFactory<TTriggerValue> : ITriggeredFunctionInstanceFactory<TTriggerValue>
+    public class TriggeredFunctionInstanceFactory<TTriggerValue> : ITriggeredFunctionInstanceFactory<TTriggerValue>
     {
         private readonly ITriggeredFunctionBinding<TTriggerValue> _binding;
         private readonly IFunctionInvoker _invoker;

@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace Microsoft.Azure.WebJobs.Host
 {
-    internal class PropertyHelper
+    public class PropertyHelper
     {
         private static ConcurrentDictionary<Type, PropertyHelper[]> _reflectionCache = new ConcurrentDictionary<Type, PropertyHelper[]>();
 

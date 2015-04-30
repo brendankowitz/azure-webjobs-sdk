@@ -7,7 +7,7 @@ using System.Globalization;
 
 namespace Microsoft.Azure.WebJobs.Host.Bindings
 {
-    internal static class BindingDataPath
+    public static class BindingDataPath
     {
         public static IReadOnlyDictionary<string, string> ConvertParameters(IReadOnlyDictionary<string, object> bindingData)
         {

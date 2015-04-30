@@ -6,7 +6,7 @@ using System.Configuration;
 
 namespace Microsoft.Azure.WebJobs.Host.Executors
 {
-    internal class AmbientConnectionStringProvider : IConnectionStringProvider
+    public class AmbientConnectionStringProvider : IConnectionStringProvider
     {
         private static readonly AmbientConnectionStringProvider _instance = new AmbientConnectionStringProvider();
 

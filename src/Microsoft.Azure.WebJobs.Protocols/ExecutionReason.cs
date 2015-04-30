@@ -15,7 +15,7 @@ namespace Microsoft.Azure.WebJobs.Host.Protocols
 #if PUBLICPROTOCOL
     public enum ExecutionReason
 #else
-    internal enum ExecutionReason
+    public enum ExecutionReason
 #endif
     {
         /// <summary>Indicates a function executed because of an automatic trigger.</summary>

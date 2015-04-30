@@ -13,24 +13,20 @@ using Microsoft.Azure.WebJobs.Host.Bindings.ConsoleOutput;
 using Microsoft.Azure.WebJobs.Host.Bindings.Invoke;
 using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Protocols;
-using Microsoft.Azure.WebJobs.Host.Storage;
 using Microsoft.Azure.WebJobs.Host.Triggers;
 
 namespace Microsoft.Azure.WebJobs.Host.Indexers
 {
-    // Go down and build an index
     internal class FunctionIndexer
     {
         private static readonly BindingFlags _publicMethodFlags = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-        private static readonly Func<MethodInfo, bool> _hasServiceBusAttributeDefault = _ => false;
 
         private readonly ITriggerBindingProvider _triggerBindingProvider;
         private readonly IBindingProvider _bindingProvider;
         private readonly IJobActivator _activator;
-        private readonly Func<MethodInfo, bool> _hasServiceBusAttribute;
+        private readonly HashSet<Assembly> _jobTypeAssemblies;
 
-        public FunctionIndexer(ITriggerBindingProvider triggerBindingProvider, IBindingProvider bindingProvider,
-            IJobActivator activator)
+        public FunctionIndexer(ITriggerBindingProvider triggerBindingProvider, IBindingProvider bindingProvider, IJobActivator activator, IExtensionRegistry extensions)
         {
             if (triggerBindingProvider == null)
             {
@@ -50,37 +46,25 @@ namespace Microsoft.Azure.WebJobs.Host.Indexers
             _triggerBindingProvider = triggerBindingProvider;
             _bindingProvider = bindingProvider;
             _activator = activator;
-
-            Type serviceBusIndexerType = ServiceBusExtensionTypeLoader.Get("Microsoft.Azure.WebJobs.ServiceBus.ServiceBusIndexer");
-            if (serviceBusIndexerType != null)
-            {
-                MethodInfo serviceBusIndexerMethod = serviceBusIndexerType.GetMethod("HasSdkAttribute", new Type[] { typeof(MethodInfo) });
-                Debug.Assert(serviceBusIndexerMethod != null);
-                _hasServiceBusAttribute = (Func<MethodInfo, bool>)serviceBusIndexerMethod.CreateDelegate(
-                    typeof(Func<MethodInfo, bool>));
-            }
-            else
-            {
-                _hasServiceBusAttribute = _hasServiceBusAttributeDefault;
-            }
+            _jobTypeAssemblies = new HashSet<Assembly>(GetJobTypeAssemblies(extensions, typeof(ITriggerBindingProvider), typeof(IBindingProvider)));
         }
 
         public async Task IndexTypeAsync(Type type, IFunctionIndexCollector index, CancellationToken cancellationToken)
         {
-            foreach (MethodInfo method in type.GetMethods(_publicMethodFlags).Where(IsSdkMethod))
+            foreach (MethodInfo method in type.GetMethods(_publicMethodFlags).Where(IsJobMethod))
             {
                 await IndexMethodAsync(method, index, cancellationToken);
             }
         }
 
-        public bool IsSdkMethod(MethodInfo method)
+        public bool IsJobMethod(MethodInfo method)
         {
             if (method.ContainsGenericParameters)
             {
                 return false;
             }
 
-            if (method.GetCustomAttributesData().Any(HasSdkAttribute))
+            if (method.GetCustomAttributesData().Any(HasJobAttribute))
             {
                 return true;
             }
@@ -90,12 +74,7 @@ namespace Microsoft.Azure.WebJobs.Host.Indexers
                 return false;
             }
 
-            if (method.GetParameters().Any(p => p.GetCustomAttributesData().Any(HasSdkAttribute)))
-            {
-                return true;
-            }
-
-            if (_hasServiceBusAttribute(method))
+            if (method.GetParameters().Any(p => p.GetCustomAttributesData().Any(HasJobAttribute)))
             {
                 return true;
             }
@@ -103,13 +82,28 @@ namespace Microsoft.Azure.WebJobs.Host.Indexers
             return false;
         }
 
-        private static bool HasSdkAttribute(CustomAttributeData attributeData)
+        private static HashSet<Assembly> GetJobTypeAssemblies(IExtensionRegistry extensions, params Type[] extensionTypes)
         {
-            return attributeData.AttributeType.Assembly == typeof(BlobAttribute).Assembly;
+            // create a set containing our own core assemblies
+            HashSet<Assembly> assemblies = new HashSet<Assembly>();
+            assemblies.Add(typeof(BlobAttribute).Assembly);
+       
+            // add any extension assemblies
+            foreach (Type extensionType in extensionTypes)
+            {
+                var currAssemblies = extensions.GetExtensions(extensionType).Select(p => p.GetType().Assembly);
+                assemblies.UnionWith(currAssemblies);
+            }
+
+            return assemblies;
         }
 
-        public async Task IndexMethodAsync(MethodInfo method, IFunctionIndexCollector index,
-            CancellationToken cancellationToken)
+        private bool HasJobAttribute(CustomAttributeData attributeData)
+        {
+            return _jobTypeAssemblies.Contains(attributeData.AttributeType.Assembly);
+        }
+
+        public async Task IndexMethodAsync(MethodInfo method, IFunctionIndexCollector index, CancellationToken cancellationToken)
         {
             try
             {

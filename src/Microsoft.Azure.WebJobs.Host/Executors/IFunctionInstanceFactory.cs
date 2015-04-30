@@ -7,7 +7,7 @@ using Microsoft.Azure.WebJobs.Host.Protocols;
 
 namespace Microsoft.Azure.WebJobs.Host.Executors
 {
-    internal interface IFunctionInstanceFactory
+    public interface IFunctionInstanceFactory
     {
         IFunctionInstance Create(Guid id, Guid? parentId, ExecutionReason reason,
             IDictionary<string, object> parameters);

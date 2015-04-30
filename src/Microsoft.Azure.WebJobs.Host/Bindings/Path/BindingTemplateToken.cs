@@ -8,7 +8,7 @@ namespace Microsoft.Azure.WebJobs.Host.Bindings.Path
     /// binding template string. Then generated token may be consumed to create instance of 
     /// <see cref="BindingTemplate"/> or <see cref="BindingTemplateSource"/>.
     /// </summary>
-    internal struct BindingTemplateToken
+    public struct BindingTemplateToken
     {
         private readonly string _value;
         private readonly bool _isParameter;

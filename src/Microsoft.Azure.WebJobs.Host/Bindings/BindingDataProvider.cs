@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Azure.WebJobs.Host.Bindings
 {
-    internal class BindingDataProvider : IBindingDataProvider
+    public class BindingDataProvider : IBindingDataProvider
     {
         private readonly Type _type;
         private readonly IReadOnlyDictionary<string, Type> _contract;
